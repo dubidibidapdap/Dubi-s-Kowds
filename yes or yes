@@ -1,0 +1,115 @@
+import tkinter as tk
+import random
+
+window = tk.Tk()
+window.title("yes or yes")
+window.geometry('350x550')
+canvas = tk.Canvas(window, width=350, height=550, bg='#1A1227')
+canvas.pack()
+
+previous_text = None
+no_click_counts = 0
+yes_buttons = []
+is_first_yes = True
+
+def on_yes_button_clicked():
+    global is_first_yes
+    
+    if is_first_yes:
+        canvas.itemconfig(Q_label, text='Should we date?', fill='#fdf2e9', font=('georgia', 14))
+        no_button.config(state='disabled')
+        is_first_yes = False
+
+    else:
+        canvas.itemconfig(Q_label, text='Nice!', fill='#fdf2e9', font=('georgia', 16))
+        canvas.delete(no_button_wndw)
+        canvas.delete(yes_button_wndw)
+
+        for button_window in yes_buttons:
+            canvas.delete(button_window)
+        yes_buttons.clear() 
+    
+    if previous_text is not None:
+        canvas.delete(previous_text)
+        
+def on_no_button_clicked():
+    global previous_text, no_click_counts
+    
+    questions = [
+        "Why 'NO'?",
+        "Sakit mo!",
+        "Bro, whyyy!?",
+        "oh c'mon!",
+        "Bruhhhh",
+        "Grabe naa"
+    ]
+
+    random_Qs = random.choice(questions)
+
+    if previous_text is not None:
+        canvas.delete(previous_text)
+        
+    new_x = random.randint(50, 300)  
+    new_y = random.randint(100, 450)
+    previous_text = canvas.create_text(new_x, new_y, text=random_Qs, fill='#fdf2e9', font=('georgia', 14))
+    
+    new_x_button = random.randint(50, 300)  
+    new_y_button = random.randint(100, 450)
+    canvas.coords(no_button_wndw, new_x_button, new_y_button)
+
+    no_click_counts += 1
+    print(f"No clicks: {no_click_counts}")
+    if no_click_counts >= 3:
+        multiple_yes_buttons()
+    if no_click_counts == 6:
+        orig_state()
+        replace_no_with_yes()
+
+def multiple_yes_buttons():
+    for _ in range(5):
+        yes_button = tk.Button(canvas, text='YES', font=('georgia', 8), width=8, command=on_yes_button_clicked, borderwidth=1, cursor='hand2', bg='#1A1227', fg='#F8426A')
+        new_x = random.randint(50, 300)
+        new_y = random.randint(100, 450)
+        yes_button_window = canvas.create_window(new_x, new_y, window=yes_button)
+        yes_buttons.append(yes_button_window)
+
+def orig_state():
+    global previous_text 
+    
+    for button_window in yes_buttons:
+        canvas.delete(button_window)
+    yes_buttons.clear()
+
+    if previous_text is not None:
+        canvas.delete(previous_text)
+    previous_text = None
+
+    canvas.delete(no_button_wndw)
+
+    global no_click_counts
+    no_click_counts = 0
+
+def replace_no_with_yes():
+    global no_button_wndw, previous_text
+
+    if previous_text is not None:
+        canvas.delete(previous_text)
+    previous_text = None
+
+    yes_button = tk.Button(canvas, text='YES', font=('georgia', 8), width=8, command=on_yes_button_clicked, 
+                           borderwidth=1, cursor='hand2', bg='#1A1227', fg='#F8426A')
+    new_x = 220
+    new_y = 200
+    yes_button_wndw = canvas.create_window(new_x, new_y, window=yes_button)
+    yes_buttons.append(yes_button_wndw)
+
+
+Q_label = canvas.create_text(170, 150, text='Do you have a crush on me?', fill='#fdf2e9', font=('georgia', 14))
+
+yes_button = tk.Button(canvas, text='YES', font=('georgia', 8), width=8, command=on_yes_button_clicked, borderwidth=1, cursor='hand2', bg='#1A1227', fg='#F8426A')
+yes_button_wndw = canvas.create_window(120, 200, window=yes_button)
+
+no_button = tk.Button(canvas, text='NO', font=('georgia', 8), width=8, command=on_no_button_clicked, borderwidth=1, cursor='hand2', bg='#1A1227', fg='#F8426A')
+no_button_wndw = canvas.create_window(220, 200, window=no_button)
+
+window.mainloop()
